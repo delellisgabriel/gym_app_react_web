@@ -16,7 +16,7 @@ type AuthStatus = 'loading' | 'authenticated' | 'unauthenticated'
 export interface AuthContextValue {
   status: AuthStatus
   user: AuthUser | null
-  login: (gymId: number, email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   logoutAll: () => Promise<void>
 }
@@ -65,19 +65,16 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // ── Login ─────────────────────────────────────────────────────────────────
-  const login = useCallback(
-    async (gymId: number, email: string, password: string) => {
-      const { data } = await apiClient.post<{
-        user: AuthUser
-        accessToken: string
-      }>('/auth/login', { gymId, email, password })
+  const login = useCallback(async (email: string, password: string) => {
+    const { data } = await apiClient.post<{
+      user: AuthUser
+      accessToken: string
+    }>('/auth/login', { email, password })
 
-      setAccessToken(data.accessToken)
-      setUser(data.user)
-      setStatus('authenticated')
-    },
-    []
-  )
+    setAccessToken(data.accessToken)
+    setUser(data.user)
+    setStatus('authenticated')
+  }, [])
 
   // ── Logout ────────────────────────────────────────────────────────────────
   const logout = useCallback(async () => {

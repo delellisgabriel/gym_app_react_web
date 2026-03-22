@@ -14,8 +14,7 @@ import axios, {
   type InternalAxiosRequestConfig
 } from 'axios'
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL ?? 'https://api.yourdomain.com'
+export const API_BASE_URL = import.meta.env.VITE_API_URL
 
 // In-memory token — intentionally NOT exported as a mutable variable.
 // Go through getAccessToken / setAccessToken to manage it.
