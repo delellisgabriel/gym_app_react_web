@@ -32,6 +32,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   // ── Silent refresh on page load ───────────────────────────────────────────
   // The httpOnly cookie is sent automatically; server returns a fresh access token.
   useEffect(() => {
+    let cancelled = false
     ;(async () => {
       try {
         const { data } = await apiClient.post<{
@@ -40,17 +41,23 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           user?: AuthUser
         }>('/auth/refresh')
 
+        if (cancelled) return
         setAccessToken(data.accessToken)
 
         // Fetch user info with the new access token
         const meRes = await apiClient.get<{ user: AuthUser }>('/auth/me')
+        if (cancelled) return
         setUser(meRes.data.user as AuthUser)
         setStatus('authenticated')
       } catch {
+        if (cancelled) return
         setAccessToken(null)
         setStatus('unauthenticated')
       }
     })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // ── Listen for forced logout (token refresh failure from interceptor) ──────
