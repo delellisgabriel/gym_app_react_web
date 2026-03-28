@@ -43,7 +43,28 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
 // ─── Response interceptor + silent refresh ───────────────────────────────────
 
-let isRefreshing = false
+// ─── Silent refresh (deduplicated) ──────────────────────────────────────────
+// A single shared promise prevents concurrent calls (e.g. React StrictMode
+// double-invoking effects) from rotating the same token twice.
+
+let _refreshPromise: Promise<string> | null = null
+
+export function silentRefresh(): Promise<string> {
+  if (_refreshPromise) return _refreshPromise
+  _refreshPromise = apiClient
+    .post<{ accessToken: string }>('/auth/refresh')
+    .then(({ data }) => {
+      setAccessToken(data.accessToken)
+      return data.accessToken
+    })
+    .finally(() => {
+      _refreshPromise = null
+    })
+  return _refreshPromise
+}
+
+// ─── Response interceptor + silent refresh on 401 ───────────────────────────
+
 let failedQueue: Array<{
   resolve: (token: string) => void
   reject: (err: unknown) => void
@@ -69,38 +90,25 @@ apiClient.interceptors.response.use(
       (error.response?.data as any)?.error === 'ACCESS_TOKEN_EXPIRED'
 
     if (isExpired && !original._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject })
-        }).then((token) => {
+      if (_refreshPromise) {
+        return _refreshPromise.then((token) => {
           original.headers.Authorization = `Bearer ${token}`
           return apiClient(original)
         })
       }
 
       original._retry = true
-      isRefreshing = true
 
       try {
-        // Cookie is sent automatically via withCredentials
-        const { data } = await axios.post<{ accessToken: string }>(
-          `${API_BASE_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        )
-
-        setAccessToken(data.accessToken)
-        processQueue(null, data.accessToken)
-        original.headers.Authorization = `Bearer ${data.accessToken}`
+        const token = await silentRefresh()
+        processQueue(null, token)
+        original.headers.Authorization = `Bearer ${token}`
         return apiClient(original)
       } catch (refreshError) {
         processQueue(refreshError, null)
         setAccessToken(null)
-        // Fire a custom event so AuthContext can redirect to login
         window.dispatchEvent(new Event('auth:logout'))
         return Promise.reject(refreshError)
-      } finally {
-        isRefreshing = false
       }
     }
 

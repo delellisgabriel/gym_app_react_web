@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState, useCallback } from 'react'
-import { apiClient, setAccessToken } from '../api/client'
+import { apiClient, setAccessToken, silentRefresh } from '../api/client'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -35,14 +35,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false
     ;(async () => {
       try {
-        const { data } = await apiClient.post<{
-          accessToken: string
-          refreshToken?: string // ignored on web
-          user?: AuthUser
-        }>('/auth/refresh')
+        await silentRefresh()
 
         if (cancelled) return
-        setAccessToken(data.accessToken)
 
         // Fetch user info with the new access token
         const meRes = await apiClient.get<{ user: AuthUser }>('/auth/me')
