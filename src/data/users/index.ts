@@ -56,5 +56,14 @@ export const useUsers = (gymId?: number, userId?: number) => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: userKeys.all })
   })
 
-  return { getMe, getAll, getById, create, update, remove }
+  const changeRole = useMutation({
+    mutationFn: ({ id, role }: { id: number; role: string }) =>
+      apiClient.patch(`/users/${id}/role`, { role }).then(({ data }) => data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.list() })
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) })
+    }
+  })
+
+  return { getMe, getAll, getById, create, update, remove, changeRole }
 }

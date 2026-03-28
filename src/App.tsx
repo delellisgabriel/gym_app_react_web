@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 import LoginPage from './pages/LoginPage'
+import AdminPage from './pages/AdminPage'
 
 // your real pages go here
 function DashboardPage() {
@@ -15,10 +16,6 @@ function DashboardPage() {
       <div>Dashboard</div>
     </>
   )
-}
-
-function AdminPage() {
-  return <div>Admin</div>
 }
 
 function UnauthorizedPage() {
