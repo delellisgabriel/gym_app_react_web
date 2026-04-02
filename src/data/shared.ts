@@ -15,3 +15,8 @@ export const bookingKeys = {
   all: ['bookings'] as const,
   mine: () => [...bookingKeys.all, 'me'] as const
 }
+
+export const trainerKeys = {
+  all: ['trainers'] as const,
+  list: () => [...trainerKeys.all, 'list'] as const
+}

@@ -1,49 +1,50 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
-
 import { ProtectedRoute } from './components/ProtectedRoute'
-import { useAuth } from './hooks/useAuth'
-import LoginPage from './pages/LoginPage'
-import AdminPage from './pages/AdminPage'
+import Layout from './components/Layout'
 
-// your real pages go here
-function DashboardPage() {
-  const { logout } = useAuth()
-
-  return (
-    <>
-      <button onClick={() => logout()}>logout</button>
-      <div>Dashboard</div>
-    </>
-  )
-}
-
-function UnauthorizedPage() {
-  return <div>403 — Access denied</div>
-}
+import LoginPage        from './pages/LoginPage'
+import UnauthorizedPage from './pages/UnauthorizedPage'
+import DashboardPage    from './pages/DashboardPage'
+import UsersPage        from './pages/UsersPage'
+import GymsPage         from './pages/GymsPage'
+import ClassesPage      from './pages/ClassesPage'
+import TrainersPage     from './pages/TrainersPage'
+import ProfilePage      from './pages/ProfilePage'
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* public */}
-          <Route path='/login' element={<LoginPage />} />
+          {/* Public */}
+          <Route path='/login'        element={<LoginPage />} />
           <Route path='/unauthorized' element={<UnauthorizedPage />} />
 
-          {/* any authenticated user */}
+          {/* Authenticated — all roles */}
           <Route element={<ProtectedRoute />}>
-            <Route path='/dashboard' element={<DashboardPage />} />
+            <Route element={<Layout />}>
+              <Route path='/dashboard' element={<DashboardPage />} />
+              <Route path='/profile'   element={<ProfilePage />} />
+
+              {/* Admin + trainer */}
+              <Route element={<ProtectedRoute role='trainer' />}>
+                <Route path='/classes' element={<ClassesPage />} />
+              </Route>
+
+              {/* Admin only */}
+              <Route element={<ProtectedRoute role='admin' />}>
+                <Route path='/users'    element={<UsersPage />} />
+                <Route path='/gyms'     element={<GymsPage />} />
+                <Route path='/trainers' element={<TrainersPage />} />
+              </Route>
+            </Route>
           </Route>
 
-          {/* admin only */}
-          <Route element={<ProtectedRoute role='admin' />}>
-            <Route path='/admin' element={<AdminPage />} />
-          </Route>
-
-          {/* fallback */}
-          <Route path='/' element={<Navigate to='/dashboard' replace />} />
-          <Route path='*' element={<Navigate to='/dashboard' replace />} />
+          {/* Fallbacks */}
+          <Route path='/'    element={<Navigate to='/dashboard' replace />} />
+          <Route path='/admin' element={<Navigate to='/users' replace />} />
+          <Route path='*'    element={<Navigate to='/dashboard' replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

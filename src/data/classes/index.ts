@@ -14,13 +14,8 @@ export const useClasses = (cursor = 0, limit = 50) => {
   })
 
   const createBatch = useMutation({
-    mutationFn: (classes: any[]) =>
-      apiClient
-        .post('/classes/create', {
-          method: 'POST',
-          body: JSON.stringify(classes)
-        })
-        .then(({ data }) => data),
+    mutationFn: (classes: unknown[]) =>
+      apiClient.post('/classes/create', classes).then(({ data }) => data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: classKeys.all })
   })
 

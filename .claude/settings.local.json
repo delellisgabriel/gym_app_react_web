@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -l \"pool.query\" c:/Users/gabo_/Desktop/development/express-generator-app/controllers/*.ts)",
+      "Bash(cat c:/Users/gabo_/Desktop/development/express-generator-app/middleware/*.ts)"
+    ]
+  }
+}
