@@ -11,8 +11,6 @@ export const useGyms = () => {
   const { status } = useAuth()
   const queryClient = useQueryClient()
 
-  console.log('status: ', status)
-
   const getAll = useQuery({
     queryKey: gymKeys.list(),
     queryFn: () => apiClient.get('/gyms').then(({ data }) => data),
