@@ -27,7 +27,6 @@ const ROLE_COLOR: Record<Role, 'default' | 'primary' | 'secondary'> = {
 }
 
 interface UserProfile {
-  id: number
   name: string
   email: string
   phone?: string
@@ -62,7 +61,6 @@ export default function ProfilePage() {
     setSuccess(false)
     try {
       await update.mutateAsync({
-        id: profile!.id,
         name: form.name,
         email: form.email,
         phone: form.phone || undefined,

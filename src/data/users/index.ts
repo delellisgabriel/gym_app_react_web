@@ -35,18 +35,10 @@ export const useUsers = (gymId?: number, userId?: number) => {
   })
 
   const update = useMutation({
-    mutationFn: ({
-      id,
-      ...body
-    }: {
-      id: number
-      name: string
-      email: string
-      phone?: string
-    }) => apiClient.put(`/users/${id}`, body).then(({ data }) => data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: userKeys.list() })
-      queryClient.invalidateQueries({ queryKey: userKeys.detail(id) })
+    mutationFn: (body: { name: string; email: string; phone?: string }) =>
+      apiClient.patch('/users/me', body).then(({ data }) => data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.me() })
     }
   })
 
