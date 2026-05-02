@@ -5,6 +5,7 @@ import Layout from './components/Layout'
 
 import LoginPage        from './pages/LoginPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
+import SetPasswordPage  from './pages/SetPasswordPage'
 import DashboardPage    from './pages/DashboardPage'
 import UsersPage        from './pages/UsersPage'
 import GymsPage         from './pages/GymsPage'
@@ -20,6 +21,7 @@ export default function App() {
           {/* Public */}
           <Route path='/login'        element={<LoginPage />} />
           <Route path='/unauthorized' element={<UnauthorizedPage />} />
+          <Route path='/set-password' element={<SetPasswordPage />} />
 
           {/* Authenticated — all roles */}
           <Route element={<ProtectedRoute />}>
