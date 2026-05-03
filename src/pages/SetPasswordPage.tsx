@@ -56,8 +56,13 @@ export default function SetPasswordPage() {
       setDone(true)
     } catch (err: any) {
       const code = err?.response?.data?.error
-      if (err?.response?.status === 410 || code === 'TOKEN_INVALID_OR_EXPIRED') {
-        setError('This link has expired or was already used. Ask your admin to resend the invite.')
+      if (
+        err?.response?.status === 410 ||
+        code === 'TOKEN_INVALID_OR_EXPIRED'
+      ) {
+        setError(
+          'This link has expired or was already used. Ask your admin to resend the invite.'
+        )
       } else if (code) {
         setError(code)
       } else {
@@ -77,7 +82,13 @@ export default function SetPasswordPage() {
         <Typography variant='body2' color='text.secondary' mb={3}>
           You can now log in with your new password.
         </Typography>
-        <Button component={Link} to='/login' variant='contained' fullWidth size='large'>
+        <Button
+          component={Link}
+          to='/login'
+          variant='contained'
+          fullWidth
+          size='large'
+        >
           Go to login
         </Button>
       </PageShell>
@@ -114,7 +125,9 @@ export default function SetPasswordPage() {
                     onClick={() => setShowPassword((s) => !s)}
                     edge='end'
                     size='small'
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
